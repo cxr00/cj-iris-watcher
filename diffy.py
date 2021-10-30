@@ -7,24 +7,39 @@ class Entry:
         self.name = data[0]
         self.id = data[1]
         self.agency = data[2]
-        self.rank = data[3]
 
-        # Not currently used but recorded anyway
-        self.status = data[4]
+        if len(data) > 3:
+            # For backwards compatibility's sake
+            self.rank = data[3]
+
+            # Not currently used in comparisons but recorded anyway
+            self.status = data[4]
+
+            self.version = "new"
+        else:
+            self.version = "old"
 
     def __eq__(self, other):
         if not isinstance(other, Entry):
             return False
         else:
-            # Do all parts match?
-            # Not including status because it's not really relevant and is bugged
-            return self.name == other.name \
-                and self.id == other.id \
-                and self.agency == other.agency \
-                and self.rank == other.rank
+            if other.version == "new":
+                # Do all parts match?
+                # Not including status because it's not really relevant and is bugged
+                return self.name == other.name \
+                    and self.id == other.id \
+                    and self.agency == other.agency \
+                    and self.rank == other.rank
+            else:
+                return self.name == other.name \
+                    and self.id == other.id \
+                    and self.agency == other.agency
 
     def __str__(self):
-        return "\t".join([self.name, self.id, self.agency, self.rank, self.status])
+        if self.version == "new":
+            return "\t".join([self.name, self.id, self.agency, self.rank, self.status])
+        else:
+            return "\t".join([self.name, self.id, self.agency])
 
 
 class EntryList:
@@ -113,5 +128,5 @@ def generate_diff_test(datecode0, datecode1):
 
 
 if __name__ == "__main__":
-    generate_diff_test("20211029", "20211030")
+    generate_diff_test("20200625", "20211029")
 
