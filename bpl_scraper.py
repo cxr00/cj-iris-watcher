@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 
 import time
 import re
+import os
 
 # The namesake of the scraper
 bpl_url = "https://www.bpl-orsnapshot.net/PublicInquiry_CJ/EmployeeSearch.aspx"
@@ -139,7 +140,7 @@ def scrape_from_all_pages(driver, search_term):
     return entries
 
 
-def scrape_all_data(datecode=None):
+def scrape_all_data(datecode=None, directory="coplist_tsv"):
     """
     Systematically collect and save the data from each search result
 
@@ -156,12 +157,16 @@ def scrape_all_data(datecode=None):
     driver = webdriver.Chrome(executable_path="chromedriver.exe")
     driver.get(bpl_url)
 
+    # Create TSV folder if one doesn't exist
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
+
     for search_term in letter_combos:
         entries = scrape_from_all_pages(driver, search_term)
 
         # Only bother if there are actually entries
         if entries:
-            with open(f"coplist_tsv/{datecode}.tsv", "a+") as f:
+            with open(f"{directory}/{datecode}.tsv", "a+") as f:
                 for entry in entries:
                     print(entry)
                     f.write("\t".join(entry) + "\n")
@@ -172,5 +177,5 @@ def scrape_all_data(datecode=None):
 
 
 if __name__ == "__main__":
-    # Put datecode here
-    scrape_all_data()
+    datecode = input("Enter the filename (eg datecode): ")
+    scrape_all_data(datecode)
