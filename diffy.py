@@ -1,6 +1,9 @@
 
 
 class Entry:
+    """
+    An individual data point from the BPL site
+    """
 
     def __init__(self, data):
         data = data.split("\t")
@@ -74,59 +77,144 @@ class EntryList:
         else:
             raise ValueError("Can only add Entries to EntryList")
 
+
+class DPSSTGroup:
+    """
+    A DPSSTGroup is an EntryList with an associated DPSST number and name
+    """
+
+    def __init__(self, dpsst_num: str, entries=None):
+        self.dpsst_num = dpsst_num
+        self.name = None
+        if entries:
+            self.entries = EntryList()
+            for entry in entries:
+                if entry.id == self.dpsst_num:
+                    self.entries.append(entry)
+                    if not self.name:
+                        self.name = entry.name
+                else:
+                    raise ValueError(f"Cannot add entry to DPSST #{self.dpsst_num} because entry's DPSST # is {entry.id}")
+
+    def __iter__(self):
+        return iter(self.entries)
+
+    def __str__(self):
+        return self.name + "\t" + self.dpsst_num
+
+    def append(self, entry: Entry):
+        if entry.id == self.dpsst_num:
+            self.entries.append(entry)
+            if not self.name:
+                self.name = entry.name
+        else:
+            raise ValueError(f"Cannot add entry to DPSST #{self.dpsst_num} because entry's DPSST # is {entry.id}")
+
+
+class DPSSTRegister:
+    """
+    A DPSSTRegister is a collection of DPSSTGroups. These can be differenced to
+    detect additions and removals from the database
+    """
+
+    def __init__(self, dpsst_groups=None):
+        self.groups = []
+        if dpsst_groups:
+            for group in dpsst_groups:
+                if isinstance(group, DPSSTGroup):
+                    self.groups.append(group)
+                else:
+                    raise ValueError("Can only add DPSSTGroup to Register")
+
+    def __iter__(self):
+        return iter(self.groups)
+
+    def __len__(self):
+        return len(self.groups)
+
+    def __str__(self):
+        output = ""
+        for each in self:
+            output += str(each) + "\n"
+        return output
+
+    @staticmethod
+    def open(filename, log=True):
+        if log:
+            print(f"Loading EntryList into DPSSTRegister from {filename}...")
+        e = EntryList.open(filename)
+        output = DPSSTRegister()
+
+        prev_char = None
+
+        for entry in e:
+            char = entry.name[0].lower()
+            if prev_char != char and log:
+                print(f"Adding entries beginning with {char}...")
+            output.add(entry)
+            prev_char = char.lower()
+
+        if log:
+            print("DPSSTRegister constructed.")
+
+        return output
+
+    def add(self, entry: Entry):
+        g = self.get(entry.id)
+        if g:
+            g.append(entry)
+        else:
+            self.groups.append(DPSSTGroup(entry.id, [entry]))
+
     def diff(self, other):
         """
-        The goal of diff is to remove the other given if it is present
-
         If self is A and other is B, then:
         A ~ B =
-            {a: a in A and a not in B}, (0) which is the removed entries
-            {b: b in B and b not in A}  (1) which is the newly-added entries
+            {a: a in A and a not in B}, which is the removed entries no longer in B
+            {b: b in B and b not in A}, which is the newly-added entries now present in B
 
-        The original EntryList becomes A ~ B (0) , and A ~ B (1) is returned
+        In order for differencing to work properly, A must be from the earlier time,
+        and B from the later time. Otherwise the results will be reversed
         """
-        if isinstance(other, Entry):
-            if other in self.data:
-                print(f"{other.name} found")
-                return self.data.pop(self.data.index(other))
-            else:
-                print(f"{other.name} not found")
-                return None
-        elif isinstance(other, EntryList):
-            not_found = []
-            for entry in other:
-                n = self.diff(entry)
-                if not n:
-                    not_found.append(entry)
+        new = []
+        for other_group in other:
+            found = False
+            for self_group in self:
+                # Only checks for the matching DPSST number, not matching entries
+                if other_group.dpsst_num == self_group.dpsst_num:
+                    self.groups.pop(self.groups.index(self_group))
+                    found = True
+                    break
+            if not found:
+                new.append(other_group)
+        return [self, DPSSTRegister(new)]
 
-            # The newly-added entries according to the differ
-            return not_found
+    def get(self, dpsst_num):
+        for each in self:
+            if each.dpsst_num == dpsst_num:
+                return each
+
+        return None
 
 
-def generate_diff_test(datecode0, datecode1):
-    pre_list = EntryList.open(f"coplist_tsv/{datecode0}.tsv")
-    post_list = EntryList.open(f"coplist_tsv/{datecode1}.tsv")
+def build_and_diff_dpsst_registers(datecode0, datecode1):
 
-    print(len(pre_list))
-    print(len(post_list))
-    print()
+    # Load registers
+    reg1 = DPSSTRegister.open(f"coplist_tsv/{datecode0}.tsv")
+    reg2 = DPSSTRegister.open(f"coplist_tsv/{datecode1}.tsv")
 
-    not_found = pre_list.diff(post_list)
+    # Diff registers
+    diff = reg1.diff(reg2)
 
-    print(len(pre_list))
-    print(len(not_found))
-    print()
-
-    # Save diff'd data
-    with open(f"coplist_tsv/diff-{datecode0}-{datecode1}.tsv", "w+") as f:
-        for entry in pre_list:
-            f.write(str(entry) + "\n")
-
-    with open(f"coplist_tsv/new-{datecode0}-{datecode1}.tsv", "w+") as f:
-        for entry in not_found:
-            f.write(str(entry) + "\n")
+    # Save diff results
+    for i in range(2):
+        if i == 0:
+            diff_type = "removed"
+        else:
+            diff_type = "added"
+        with open(f"coplist_tsv/{datecode0}-{datecode1}-{diff_type}.txt", "w+") as f:
+            f.write(str(diff[i]))
 
 
 if __name__ == "__main__":
-    generate_diff_test("20200625", "20211029")
-
+    build_and_diff_dpsst_registers("20211029", "20211030")
