@@ -40,6 +40,41 @@ def pull_singleton_from_line(line):
     return rank
 
 
+def go_to_first_page(driver):
+    # Get the part of the page that has page numbers
+    trimmed_html = trim_left(driver.page_source, "ListFooter")
+
+    try:
+        # If there are multiple pages, this will get the highlighted one
+        current_page = int(trimmed_html[3].split("<span>")[1].split("</span>")[0])
+    except IndexError:
+        # There is only one page
+        return False
+
+    # Ellipsis indicates a page that has different link text and may be the next page
+    elements = driver.find_elements(By.LINK_TEXT, "...")
+
+    for element in elements:
+        # Pull the page number from the link text
+        href = element.get_attribute("href")
+        m = re.search(r"Page\$[0-9]*", href)
+        if m:
+            ellipsis_page = int(m.group(0)[5:])
+            if ellipsis_page == current_page - 1:
+                # This is the next page
+                element.send_keys(Keys.RETURN)
+                return True
+
+    try:
+        # Simply try to get the previous page
+        element = driver.find_element(By.LINK_TEXT, str(current_page - 1))
+        element.send_keys(Keys.RETURN)
+        return True
+    except NoSuchElementException:
+        # No such page exists
+        return False
+
+
 def go_to_next_page(driver):
     """
     Instruct the webdriver to find and go to the next page if one exists.
@@ -94,6 +129,10 @@ def scrape_from_all_pages(driver, search_term):
     search_bar.clear()
     search_bar.send_keys(search_term)
     search_bar.send_keys(Keys.RETURN)
+
+    # Ensure we're on the first page (what a weird bug)
+    while go_to_first_page(driver):
+        pass
 
     trimmed_html = trim_left(driver.page_source, "ListTableAnyHeight")
 
