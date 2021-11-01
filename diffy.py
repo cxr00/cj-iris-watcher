@@ -241,38 +241,3 @@ class DPSSTRegister:
                 else:
                     for entry in each:
                         self.add(entry)
-
-
-def build_and_diff_dpsst_registers(datecode0, datecode1, directory="coplist_tsv", log=True):
-
-    # Load registers
-    if log:
-        print("Loading registers for differencing...")
-
-    reg1 = DPSSTRegister.open(f"{directory}/{datecode0}.tsv", log=log)
-    reg2 = DPSSTRegister.open(f"{directory}/{datecode1}.tsv", log=log)
-
-    # Diff registers
-    diff = reg1.diff(reg2, log=log)
-
-    # Save diff results
-    if log:
-        print("Saving differenced register...")
-
-    for i in range(2):
-        if i == 0:
-            diff_type = "removed"
-        else:
-            diff_type = "added"
-
-        with open(f"{directory}/{datecode0}-{datecode1}-{diff_type}.tsv", "w+") as f:
-            f.write(str(diff[i]))
-
-        if log:
-            print(f"Saved {datecode0}-{datecode1}-{diff_type}.tsv")
-
-
-if __name__ == "__main__":
-    # build_and_diff_dpsst_registers("20200625", "20211029")
-    # status_test()
-    pass
