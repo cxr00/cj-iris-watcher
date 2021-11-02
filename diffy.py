@@ -71,6 +71,12 @@ class EntryList:
     def __len__(self):
         return len(self.data)
 
+    def __str__(self):
+        output = ""
+        for entry in self:
+            output += str(entry) + "\n"
+        return output
+
     @staticmethod
     def open(filepath):
         entries = []
@@ -85,6 +91,39 @@ class EntryList:
             self.data.append(item)
         else:
             raise ValueError("Can only add Entries to EntryList")
+
+    def diff(self, other, log=True):
+        """
+        If self is A and other is B, then:
+        A ~ B =
+            {a: a in A and a not in B}, which is the removed entries no longer in B
+            {b: b in B and b not in A}, which is the newly-added entries now present in B
+
+        In order for differencing to work properly, A must be from the earlier time,
+        and B from the later time. Otherwise the results will be reversed
+        """
+        if not isinstance(other, EntryList):
+            raise ValueError(f"Cannot difference {type(other)}, only EntryList")
+        else:
+            new = []
+            if log:
+                print("Differencing EntryLists...")
+            for entry in other:
+                if entry in self:
+                    self.data.pop(self.data.index(entry))
+                else:
+                    new.append(entry)
+            if log:
+                print("Differencing complete.")
+            return [self, EntryList(new)]
+
+    def sum(self, other):
+        if not isinstance(other, EntryList):
+            raise ValueError(f"Cannot sum {type(other)}, only EntryList")
+        else:
+            # Beware! This does not deal with duplicates
+            for entry in other:
+                self.append(entry)
 
 
 class DPSSTGroup:
@@ -104,6 +143,15 @@ class DPSSTGroup:
                         self.name = entry.name
                 else:
                     raise ValueError(f"Cannot add entry to DPSST #{self.dpsst_num} because entry's DPSST # is {entry.id}")
+
+    def __eq__(self, other):
+        if not isinstance(other, DPSSTGroup):
+            return False
+        else:
+            return self.dpsst_num == other.dpsst_num \
+                   and self.name == other.name \
+                   and all([e in self for e in other]) \
+                   and all([e in other for e in self])
 
     def __iter__(self):
         return iter(self.entries)
