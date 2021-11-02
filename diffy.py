@@ -108,7 +108,13 @@ class DPSSTGroup:
     def __iter__(self):
         return iter(self.entries)
 
-    def __str__(self):
+    def __str__(self, display_full=True):
+        if display_full:
+            output = ""
+            for entry in self.entries:
+                output += str(entry) + "\n"
+            output = output[:-1]
+            return output
         return self.name + "\t" + self.dpsst_num
 
     @staticmethod
@@ -149,10 +155,10 @@ class DPSSTRegister:
     def __len__(self):
         return len(self.groups)
 
-    def __str__(self):
+    def __str__(self, display_full=True):
         output = ""
         for each in self:
-            output += str(each) + "\n"
+            output += each.__str__(display_full) + "\n"
         return output
 
     @staticmethod
