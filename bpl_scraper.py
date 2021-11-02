@@ -40,7 +40,7 @@ def pull_singleton_from_line(line):
     return rank
 
 
-def go_to_first_page(driver):
+def go_to_previous_page(driver):
     # Get the part of the page that has page numbers
     trimmed_html = trim_left(driver.page_source, "ListFooter")
 
@@ -131,7 +131,7 @@ def scrape_from_all_pages(driver, search_term):
     search_bar.send_keys(Keys.RETURN)
 
     # Ensure we're on the first page (what a weird bug)
-    while go_to_first_page(driver):
+    while go_to_previous_page(driver):
         pass
 
     trimmed_html = trim_left(driver.page_source, "ListTableAnyHeight")
