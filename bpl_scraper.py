@@ -179,15 +179,35 @@ def scrape_from_all_pages(driver, search_term):
     return entries
 
 
-def scrape_all_data(datecode=None, directory="coplist_tsv"):
+def scrape_all_data(datecode=None, directory=None, overwrite=False):
     """
-    Systematically collect and save the data from each search result
+    Systematically collect and save the data from each search result, resulting
+    in a complete set of the day's data
 
-    :param datecode: To be used as the filename
+    :param datecode: To be used to generate the filename
+    :param directory: To be used to generate the filename
+    :param overwrite: If the generated file already exists, determine whether to overwrite it
     """
 
     # If called without arguments, no harm done
     if not datecode:
+        return
+
+    if directory and not os.path.isdir(directory):
+        os.mkdir(directory)
+
+    if directory:
+        filename = f"{directory}/{datecode}.tsv"
+    else:
+        filename = f"{datecode}.tsv"
+
+    # If it already exists, overwrite it
+    # I'll be careful, I promise
+    if os.path.exists(filename) and overwrite:
+        with open(filename, "w"):
+            pass
+    else:
+        print(f"Won't overwrite existing file {filename}")
         return
 
     letter_combos = [chr(i) + chr(j) for i in range(97, 123) for j in range(97, 123)]
@@ -205,7 +225,7 @@ def scrape_all_data(datecode=None, directory="coplist_tsv"):
 
         # Only bother if there are actually entries
         if entries:
-            with open(f"{directory}/{datecode}.tsv", "a+") as f:
+            with open(filename, "a+") as f:
                 for entry in entries:
                     print(entry)
                     f.write("\t".join(entry) + "\n")
@@ -213,8 +233,3 @@ def scrape_all_data(datecode=None, directory="coplist_tsv"):
     # Relax
     time.sleep(8)
     driver.close()
-
-
-if __name__ == "__main__":
-    datecode = input("Enter the filename (eg datecode): ")
-    scrape_all_data(datecode)
