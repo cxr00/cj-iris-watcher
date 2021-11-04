@@ -201,14 +201,15 @@ def scrape_all_data(datecode=None, directory=None, overwrite=False):
     else:
         filename = f"{datecode}.tsv"
 
-    # If it already exists, overwrite it
+    # If it already exists, try to overwrite it
     # I'll be careful, I promise
-    if os.path.exists(filename) and overwrite:
-        with open(filename, "w"):
-            pass
-    else:
-        print(f"Won't overwrite existing file {filename}")
-        return
+    if os.path.exists(filename):
+        if overwrite:
+            with open(filename, "w"):
+                pass
+        else:
+            print(f"Won't overwrite existing file {filename}")
+            return
 
     letter_combos = [chr(i) + chr(j) for i in range(97, 123) for j in range(97, 123)]
 
