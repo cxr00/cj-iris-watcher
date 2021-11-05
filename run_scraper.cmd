@@ -1,0 +1,2 @@
+python pipeline.py
+pause
