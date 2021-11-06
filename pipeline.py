@@ -5,11 +5,6 @@ import datetime
 import os
 
 
-def generate_filename(directory, datecode0, datecode1, added=True):
-    # Friendly filename constructor
-    return f"{directory}/{datecode0}-{datecode1}{'+' if added else '-'}.tsv"
-
-
 def scrape_and_diff_today_from_yesterday():
     # Construct datecodes
     today = datetime.datetime.now()
@@ -25,7 +20,6 @@ def scrape_and_diff_today_from_yesterday():
         print("Today's data has already been scraped.")
 
     # If there isn't already a file for datecode0, ask for an alternate
-    # This is rag-tag because
     while not os.path.exists(f"repo/scrape/{datecode0}.tsv"):
         print(f"No file for {datecode0} to measure against.")
         datecode0 = input("Enter an alternate datecode, or leave it empty to exit: ")
@@ -38,26 +32,27 @@ def scrape_and_diff_today_from_yesterday():
     el1 = EntryList.open(f"repo/scrape/{datecode1}.tsv")
     diff = el0.diff(el1, log=True)
 
-    print(f"Removed since {datecode0}:")
+    print(f"Removed since {datecode0[4:6]}/{datecode0[6:]}/{datecode0[:4]} (-):")
     print(str(diff[0]))
     print()
 
-    print(f"Added to {datecode1}:")
+    print(f"Added to {datecode1[4:6]}/{datecode1[6:]}/{datecode1[:4]} (+):")
     print(str(diff[1]))
 
-    addition_file = generate_filename("repo/added", datecode0, datecode1, True)
-    removal_file = generate_filename("repo/removed", datecode0, datecode1, False)
+    diff_file = f"repo/diff/{datecode0}-{datecode1}.tsv"
 
-    # Always overwrite, it's fine since we're not always scraping
-    with open(removal_file, "w+") as f:
-        f.write(str(diff[0]))
+    report_string = ""
 
-    print(f"Saved removals to {removal_file}")
+    for entry in diff[0]:
+        report_string += "-" + str(entry) + "\n"
 
-    with open(addition_file, "w+") as f:
-        f.write(str(diff[1]))
+    for entry in diff[1]:
+        report_string += "+" + str(entry) + "\n"
 
-    print(f"Saved additions to {addition_file}")
+    with open(diff_file, "w+") as f:
+        f.write(report_string)
+
+    print(f"Difference saved to {diff_file}")
 
 
 if __name__ == "__main__":

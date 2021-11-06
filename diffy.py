@@ -30,14 +30,14 @@ class Entry:
         if not isinstance(other, Entry):
             return False
         else:
-            if other.version == "1":
+            if self.version == "1" or other.version == "1":
                 return self.name == other.name \
                     and self.id == other.id
-            elif other.version == "old":
+            elif self.version == "old" or other.version == "old":
                 return self.name == other.name \
                     and self.id == other.id \
                     and self.agency == other.agency
-            elif other.version == "new":
+            elif self.version == "new" or other.version == "new":
                 # Do all parts match?
                 # Not including status because it's not really relevant and is bugged
                 return self.name == other.name \
@@ -124,3 +124,14 @@ class EntryList:
             # Beware! This does not deal with duplicates
             for entry in other:
                 self.append(entry)
+
+
+class DiffEntry(Entry):
+
+    def __init__(self, data):
+        super().__init__(data[1:])
+        self.mode = data[0]
+
+    def __str__(self):
+        return self.mode + super().__str__()
+
