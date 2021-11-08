@@ -214,7 +214,7 @@ def scrape_all_data(datecode=None, directory=None, overwrite=False):
     letter_combos = [chr(i) + chr(j) for i in range(97, 123) for j in range(97, 123)]
 
     # If your driver is in a different place, change this
-    driver = webdriver.Chrome(executable_path="chromedriver.exe")
+    driver = webdriver.Chrome(executable_path="../chromedriver.exe")
     driver.get(bpl_url)
 
     # Create TSV folder if one doesn't exist

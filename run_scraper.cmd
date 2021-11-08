@@ -1,2 +1,2 @@
-python pipeline.py
+python app/pipeline.py
 pause

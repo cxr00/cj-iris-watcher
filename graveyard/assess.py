@@ -1,4 +1,4 @@
-from diffy import EntryList
+from app.diffy import EntryList
 from graveyard.dpsst_register import DPSSTRegister
 
 import os

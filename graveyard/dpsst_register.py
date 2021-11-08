@@ -1,4 +1,4 @@
-from diffy import Entry, EntryList
+from app.diffy import Entry, EntryList
 
 
 class DPSSTGroup:
