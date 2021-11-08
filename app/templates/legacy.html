@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Legacy data</title>
+    <script src="/static/nav.js"></script>
+    <link rel="stylesheet" href="/static/legacy-style.css">
+</head>
+<body>
+    <button id="adds_0" onclick="show_only_this(&quot;zero&quot;)">Additions from 2019/02/02 to 2020/06/25</button>
+    <button id="rms_0" onclick="show_only_this(&quot;one&quot;)">Removals from 2019/02/02 to 2020/06/25</button>
+    <button id="adds_1" onclick="show_only_this(&quot;two&quot;)">Additions from 2020/06/25 to 2021/11/01</button>
+    <button id="rms_1" onclick="show_only_this(&quot;three&quot;)">Removals from 2020/06/25 to 2021/11/01</button>
+    <button id="modern" onclick="go_to(&quot;&quot;)">Return to modern data</button>
+
+    <div id="zero">
+        <p>Additions from 2019/02/02 to 2020/06/25</p>
+
+        <table>
+            {% for entry in adds0 %}
+            {% if entry.agency == "Portland Police Bureau" %}
+            <tr class="ppb">
+            {% else %}
+            <tr>
+            {% endif %}
+                <td>{{entry.name}}</td>
+                <td>{{entry.id}}</td>
+                <td>{{entry.agency}}</td>
+                <td>{{entry.rank}}</td>
+                <td>{{entry.status}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="one">
+        <p>Removals from 2019/02/02 to 2020/06/25</p>
+        <table>
+            {% for entry in rms0 %}
+            {% if entry.agency == "Portland Police Bureau" %}
+            <tr class="ppb">
+            {% else %}
+            <tr>
+            {% endif %}
+                <td>{{entry.name}}</td>
+                <td>{{entry.id}}</td>
+                <td>{{entry.agency}}</td>
+                <td>{{entry.rank}}</td>
+                <td>{{entry.status}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="two">
+        <p>Additions from 2020/06/25 to 2021/11/01</p>
+        <table>
+            {% for entry in adds1 %}
+            {% if entry.agency == "Portland Police Bureau" %}
+            <tr class="ppb">
+            {% else %}
+            <tr>
+            {% endif %}
+                <td>{{entry.name}}</td>
+                <td>{{entry.id}}</td>
+                <td>{{entry.agency}}</td>
+                <td>{{entry.rank}}</td>
+                <td>{{entry.status}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="three">
+        <p>Removals from 2020/06/25 to 2021/11/01</p>
+        <table>
+            {% for entry in rms1 %}
+            {% if entry.agency == "Portland Police Bureau" %}
+            <tr class="ppb">
+            {% else %}
+            <tr>
+            {% endif %}
+                <td>{{entry.name}}</td>
+                <td>{{entry.id}}</td>
+                <td>{{entry.agency}}</td>
+                <td>{{entry.rank}}</td>
+                <td>{{entry.status}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

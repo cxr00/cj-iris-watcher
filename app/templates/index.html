@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PPB watcher</title>
+    <script src="/static/nav.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <button id="previous" onclick="go_to(&quot;{{yesterday}}&quot;)">Go to yesterday: {{yesterday}}</button>
+    <button id="next" onclick="go_to(&quot;{{tomorrow}}&quot;)">Go to tomorrow: {{tomorrow}}</button>
+    <button id="legacy" onclick="go_to(&quot;legacy&quot;)">View legacy data</button>
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>DPSST #</th>
+            <th>Agency</th>
+            <th>Rank/Position</th>
+            <th>Status</th>
+        </tr>
+        <tr><h3>Added today: {{today}}</h3></tr>
+
+        {% for entry in added %}
+        {% if entry.agency == "Portland Police Bureau" %}
+        <tr class="ppb">
+        {% else %}
+        <tr>
+        {% endif %}
+            <td>{{entry.name}}</td>
+            <td>{{entry.id}}</td>
+            <td>{{entry.agency}}</td>
+            <td>{{entry.rank}}</td>
+            <td>{{entry.status}}</td>
+        </tr>
+        {% endfor %}
+
+        <tr>
+            <td><h3>Removed since yesterday: {{yesterday}}</h3></td>
+        </tr>
+
+        {% for entry in removed %}
+        {% if entry.agency == "Portland Police Bureau" %}
+        <tr class="ppb">
+        {% else %}
+        <tr>
+        {% endif %}
+            <td>{{entry.name}}</td>
+            <td>{{entry.id}}</td>
+            <td>{{entry.agency}}</td>
+            <td>{{entry.rank}}</td>
+            <td>{{entry.status}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
