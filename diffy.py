@@ -11,11 +11,10 @@ class Entry:
         self.name = data[0]
         self.id = data[1]
 
-        self.version = "1"
-
         if len(data) > 2:
             self.agency = data[2]
-            self.version = "old"
+        else:
+            self.agency = ""
 
         if len(data) > 3:
             # For backwards compatibility's sake
@@ -23,35 +22,21 @@ class Entry:
 
             # Not currently used in comparisons but recorded anyway
             self.status = data[4]
-
-            self.version = "new"
+        else:
+            self.rank = ""
+            self.status = ""
 
     def __eq__(self, other):
         if not isinstance(other, Entry):
             return False
         else:
-            if self.version == "1" or other.version == "1":
-                return self.name == other.name \
-                    and self.id == other.id
-            elif self.version == "old" or other.version == "old":
-                return self.name == other.name \
-                    and self.id == other.id \
-                    and self.agency == other.agency
-            elif self.version == "new" or other.version == "new":
-                # Do all parts match?
-                # Not including status because it's not really relevant and is bugged
-                return self.name == other.name \
-                    and self.id == other.id \
-                    and self.agency == other.agency \
-                    and self.rank == other.rank
+            return self.name == other.name \
+                and self.id == other.id \
+                and self.agency == other.agency \
+                and self.rank == other.rank
 
     def __str__(self):
-        if self.version == "1":
-            return self.name + "\t" + self.id
-        elif self.version == "old":
-            return "\t".join([self.name, self.id, self.agency])
-        elif self.version == "new":
-            return "\t".join([self.name, self.id, self.agency, self.rank, self.status])
+        return "\t".join([self.name, self.id, self.agency, self.rank, self.status])
 
 
 class EntryList:
@@ -134,4 +119,58 @@ class DiffEntry(Entry):
 
     def __str__(self):
         return self.mode + super().__str__()
+
+
+class DiffEntryList:
+
+    def __init__(self, diff_entries=None):
+        self.diff_entries = []
+        if diff_entries:
+            for entry in diff_entries:
+                if not isinstance(entry, DiffEntry):
+                    raise ValueError(f"Incompatible type {type(entry)}, must be DiffEntry")
+                else:
+                    self.diff_entries.append(entry)
+
+    def __iter__(self):
+        return iter(self.diff_entries)
+
+    @staticmethod
+    def open(filename):
+        data = None
+        with open(filename, "r") as f:
+            data = f.readlines()
+
+        output = DiffEntryList()
+        for line in data:
+            output.append(DiffEntry(line.strip()))
+
+        return output
+
+    def append(self, item):
+        if not isinstance(item, DiffEntry):
+            raise ValueError(f"Incompatible type {type(item)}, must be DiffEntry")
+        else:
+            self.diff_entries.append(item)
+
+    def added(self):
+        output = DiffEntryList()
+        for entry in self:
+            if entry.mode == "+":
+                output.append(entry)
+        return output
+
+    def removed(self):
+        output = DiffEntryList()
+        for entry in self:
+            if entry.mode == "-":
+                output.append(entry)
+        return output
+
+    def ppb(self):
+        output = DiffEntryList()
+        for entry in self.diff_entries:
+            if "Portland Police Bureau" in entry.agency:
+                output.append(entry)
+        return output
 
