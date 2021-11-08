@@ -7,13 +7,16 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
-# Legacy additions - used for /legacy
+# Legacy additions - cache for /legacy
 el_adds_0 = EntryList.open("repo/added/20190202-20200625+.tsv").data
 el_adds_1 = EntryList.open("repo/added/20200625-20211101+.tsv").data
 
-# Legacy removals - used for /legacy
+# Legacy removals - cache for /legacy
 el_rms_0 = EntryList.open("repo/removed/20190202-20200625-.tsv").data
 el_rms_1 = EntryList.open("repo/removed/20200625-20211101-.tsv").data
+
+# Cache for difference files
+cache = {}
 
 
 def construct_filename(today, yesterday):
@@ -30,7 +33,13 @@ def today_yesterday_tomorrow(today):
 def construct_template(today):
     tyt = today_yesterday_tomorrow(today)
     filename = construct_filename(tyt[0], tyt[1])
-    diff_list = DiffEntryList.open(filename)
+    if filename in cache:
+        print(f"Accessing {filename} from cache")
+        diff_list = cache[filename]
+    else:
+        print(f"Accessing {filename} for the first time")
+        diff_list = DiffEntryList.open(filename)
+        cache[filename] = diff_list
 
     added = diff_list.added()
     removed = diff_list.removed()
