@@ -7,6 +7,14 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
+# Legacy additions - used for /legacy
+el_adds_0 = EntryList.open("repo/added/20190202-20200625+.tsv").data
+el_adds_1 = EntryList.open("repo/added/20200625-20211101+.tsv").data
+
+# Legacy removals - used for /legacy
+el_rms_0 = EntryList.open("repo/removed/20190202-20200625-.tsv").data
+el_rms_1 = EntryList.open("repo/removed/20200625-20211101-.tsv").data
+
 
 def construct_filename(today, yesterday):
     return f"repo/diff/{yesterday}-{today}.tsv"
@@ -72,15 +80,6 @@ def go_to_page(datecode):
 
 @app.route("/legacy")
 def legacy_portal():
-
-    # Additions
-    el_adds_0 = EntryList.open("repo/added/20190202-20200625+.tsv").data
-    el_adds_1 = EntryList.open("repo/added/20200625-20211101+.tsv").data
-
-    # Removals
-    el_rms_0 = EntryList.open("repo/removed/20190202-20200625-.tsv").data
-    el_rms_1 = EntryList.open("repo/removed/20200625-20211101-.tsv").data
-
     return render_template(
         "legacy.html",
         adds0=el_adds_0,
