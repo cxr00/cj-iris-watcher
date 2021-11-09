@@ -18,17 +18,19 @@
 
         <table>
             {% for entry in adds0 %}
-            {% if entry.agency == "Portland Police Bureau" %}
-            <tr class="ppb">
-            {% else %}
-            <tr>
-            {% endif %}
-                <td>{{entry.name}}</td>
-                <td>{{entry.id}}</td>
-                <td>{{entry.agency}}</td>
-                <td>{{entry.rank}}</td>
-                <td>{{entry.status}}</td>
-            </tr>
+                {% if entry.agency == "Portland Police Bureau" %}
+                    {% if entry.agency == "Portland Police Bureau" %}
+                    <tr class="ppb">
+                    {% else %}
+                    <tr>
+                    {% endif %}
+                        <td>{{entry.name}}</td>
+                        <td>{{entry.id}}</td>
+                        <td>{{entry.agency}}</td>
+                        <td>{{entry.rank}}</td>
+                        <td>{{entry.status}}</td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         </table>
     </div>
@@ -36,17 +38,19 @@
         <p>Removals from 2019/02/02 to 2020/06/25</p>
         <table>
             {% for entry in rms0 %}
-            {% if entry.agency == "Portland Police Bureau" %}
-            <tr class="ppb">
-            {% else %}
-            <tr>
-            {% endif %}
-                <td>{{entry.name}}</td>
-                <td>{{entry.id}}</td>
-                <td>{{entry.agency}}</td>
-                <td>{{entry.rank}}</td>
-                <td>{{entry.status}}</td>
-            </tr>
+                {% if entry.agency == "Portland Police Bureau" %}
+                    {% if entry.agency == "Portland Police Bureau" %}
+                    <tr class="ppb">
+                    {% else %}
+                    <tr>
+                    {% endif %}
+                        <td>{{entry.name}}</td>
+                        <td>{{entry.id}}</td>
+                        <td>{{entry.agency}}</td>
+                        <td>{{entry.rank}}</td>
+                        <td>{{entry.status}}</td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         </table>
     </div>
@@ -54,17 +58,19 @@
         <p>Additions from 2020/06/25 to 2021/11/01</p>
         <table>
             {% for entry in adds1 %}
-            {% if entry.agency == "Portland Police Bureau" %}
-            <tr class="ppb">
-            {% else %}
-            <tr>
-            {% endif %}
-                <td>{{entry.name}}</td>
-                <td>{{entry.id}}</td>
-                <td>{{entry.agency}}</td>
-                <td>{{entry.rank}}</td>
-                <td>{{entry.status}}</td>
-            </tr>
+                {% if entry.agency == "Portland Police Bureau" %}
+                    {% if entry.agency == "Portland Police Bureau" %}
+                    <tr class="ppb">
+                    {% else %}
+                    <tr>
+                    {% endif %}
+                        <td>{{entry.name}}</td>
+                        <td>{{entry.id}}</td>
+                        <td>{{entry.agency}}</td>
+                        <td>{{entry.rank}}</td>
+                        <td>{{entry.status}}</td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         </table>
     </div>
@@ -72,17 +78,19 @@
         <p>Removals from 2020/06/25 to 2021/11/01</p>
         <table>
             {% for entry in rms1 %}
-            {% if entry.agency == "Portland Police Bureau" %}
-            <tr class="ppb">
-            {% else %}
-            <tr>
-            {% endif %}
-                <td>{{entry.name}}</td>
-                <td>{{entry.id}}</td>
-                <td>{{entry.agency}}</td>
-                <td>{{entry.rank}}</td>
-                <td>{{entry.status}}</td>
-            </tr>
+                {% if entry.agency == "Portland Police Bureau" %}
+                    {% if entry.agency == "Portland Police Bureau" %}
+                    <tr class="ppb">
+                    {% else %}
+                    <tr>
+                    {% endif %}
+                        <td>{{entry.name}}</td>
+                        <td>{{entry.id}}</td>
+                        <td>{{entry.agency}}</td>
+                        <td>{{entry.rank}}</td>
+                        <td>{{entry.status}}</td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         </table>
     </div>
