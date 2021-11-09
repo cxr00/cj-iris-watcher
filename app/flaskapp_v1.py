@@ -1,55 +1,54 @@
 from flask import Flask, render_template, send_from_directory, request
-from diffy import EntryList, DiffEntryList
-from pipeline import scrape_and_diff_today_from_yesterday
-from waitress import serve
+from diffy import EntryList, DiffEntryHistory
 
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
+from waitress import serve
 
 app = Flask(__name__)
 
-# Legacy additions - cache for /legacy
-el_adds_0 = EntryList.open("repo/added/20190202-20200625+.tsv").data
-el_adds_1 = EntryList.open("repo/added/20200625-20211101+.tsv").data
+print("Loading legacy data sets...")
 
-# Legacy removals - cache for /legacy
-el_rms_0 = EntryList.open("repo/removed/20190202-20200625-.tsv").data
-el_rms_1 = EntryList.open("repo/removed/20200625-20211101-.tsv").data
+# Legacy additions
+el_adds_0 = EntryList.open("repo/legacy/added/20190202-20200625+.tsv").data
+el_adds_1 = EntryList.open("repo/legacy/added/20200625-20211101+.tsv").data
 
-# Cache for difference files
-cache = {}
+# Legacy removals
+el_rms_0 = EntryList.open("repo/legacy/removed/20190202-20200625-.tsv").data
+el_rms_1 = EntryList.open("repo/legacy/removed/20200625-20211101-.tsv").data
 
+print("Load complete.")
+print("Loading primary DiffEntryHistory...")
 
-def construct_filename(today, yesterday):
-    return f"repo/diff/{yesterday}-{today}.tsv"
+diff_eh = DiffEntryHistory.open("repo/diff")
 
-
-def today_yesterday_tomorrow(today):
-    yesterday = (datetime.strptime(today, "%Y%m%d") - timedelta(days=1)).strftime("%Y%m%d")
-    tomorrow = (datetime.strptime(today, "%Y%m%d") + timedelta(days=1)).strftime("%Y%m%d")
-
-    return [today, yesterday, tomorrow]
+print("Load complete.")
 
 
 def construct_template(today):
-    tyt = today_yesterday_tomorrow(today)
-    filename = construct_filename(tyt[0], tyt[1])
-    if filename in cache:
-        print(f"Accessing {filename} from cache")
-        diff_list = cache[filename]
+
+    # Determine value of yesterday for button functionality
+    if diff_eh.meta.index(today) != 0:
+        yesterday = diff_eh.meta[diff_eh.meta.index(today) - 1]
     else:
-        print(f"Accessing {filename} for the first time")
-        diff_list = DiffEntryList.open(filename)
-        cache[filename] = diff_list
+        yesterday = today
+
+    # Determine value of tomorrow for button functionality
+    if diff_eh.meta.index(today) != len(diff_eh.meta) - 1:
+        tomorrow = diff_eh.meta[diff_eh.meta.index(today) + 1]
+    else:
+        tomorrow = today
+
+    diff_list = diff_eh.data[diff_eh.meta.index(today) - 1]
 
     added = diff_list.added()
     removed = diff_list.removed()
 
     return render_template(
         "index.html",
-        today=tyt[0],
-        yesterday=tyt[1],
-        tomorrow=tyt[2],
+        today=today,
+        yesterday=yesterday,
+        tomorrow=tomorrow,
         added=added,
         removed=removed
     )
@@ -63,34 +62,12 @@ def favicon():
 @app.route("/")
 def front_page():
     today = datetime.today().strftime("%Y%m%d")
-    tyt = today_yesterday_tomorrow(today)
-    filename = construct_filename(tyt[0], tyt[1])
-    if os.path.exists(filename):
-        print(f"{filename} exists")
-        return construct_template(today)
-    else:
-        print(f"{filename} does not exist")
-        scrape_and_diff_today_from_yesterday()
-        return construct_template(today)
+    return construct_template(today)
 
 
 @app.route("/<datecode>")
 def go_to_page(datecode):
-    tyt = today_yesterday_tomorrow(datecode)
-
-    filename = construct_filename(tyt[0], tyt[1])
-    if os.path.exists(filename):
-        print(f"{filename} exists")
-        return construct_template(datecode)
-    else:
-        print(f"{filename} does not exist")
-
-        return render_template(
-            "no-diff.html",
-            today=tyt[0],
-            yesterday=tyt[1],
-            tomorrow=tyt[2]
-        )
+    return construct_template(datecode)
 
 
 @app.route("/legacy")
