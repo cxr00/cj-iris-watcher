@@ -1,6 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from diffy import EntryList, DiffEntryList
 from pipeline import scrape_and_diff_today_from_yesterday
+from waitress import serve
 
 import os
 from datetime import datetime, timedelta
@@ -54,6 +55,11 @@ def construct_template(today):
     )
 
 
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, "static"), "favicon.ico", mimetype='image/vnd.microsoft.icon')
+
+
 @app.route("/")
 def front_page():
     today = datetime.today().strftime("%Y%m%d")
@@ -99,4 +105,5 @@ def legacy_portal():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    print("Serving PPB Watcher")
+    serve(app, listen="*:5000")
