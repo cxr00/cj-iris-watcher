@@ -80,6 +80,19 @@ def delete_old_tsv():
                 os.remove(del_filename)
 
 
+def test_partial_rebuilds():
+    diff_eh = DiffEntryHistory.open("repo/diff")
+
+    el0 = diff_eh.rebuild(n=0)
+    el1 = diff_eh.rebuild(n=1)
+
+    el2 = el0.diff(el1)
+    print(el2[0])
+    print()
+    print(el2[1])
+    print()
+
+
 if __name__ == "__main__":
     scrape_and_diff_today_from_yesterday()
     delete_old_tsv()

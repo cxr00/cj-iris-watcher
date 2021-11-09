@@ -209,6 +209,9 @@ class DiffEntryHistory:
     def __iter__(self):
         return iter(self.data)
 
+    def __len__(self):
+        return len(self.data)
+
     @staticmethod
     def open(directory):
         with open(f"{directory}/_meta.txt") as f:
@@ -227,10 +230,14 @@ class DiffEntryHistory:
 
         return DiffEntryHistory(root=root, meta=meta, data=data)
 
-    def rebuild(self):
+    def rebuild(self, n=-1):
+        if n == -1:
+            n = len(self)
         start = EntryList(self.root.data)
 
         for diff_el in self:
+            if self.data.index(diff_el) >= n:
+                break
             start.process_diff(diff_el)
 
         return start
