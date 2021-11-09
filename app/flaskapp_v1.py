@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request
 from diffy import EntryList, DiffEntryList
 from pipeline import scrape_and_diff_today_from_yesterday
 from waitress import serve
@@ -106,4 +106,4 @@ def legacy_portal():
 
 if __name__ == "__main__":
     print("Serving PPB Watcher")
-    serve(app, listen="*:5000")
+    serve(app, host="0.0.0.0", port=5000)
