@@ -110,6 +110,21 @@ class EntryList:
             for entry in other:
                 self.append(entry)
 
+    def process_diff(self, diff):
+        if not isinstance(diff, DiffEntryList):
+            raise ValueError(f"Cannot process {type(diff)}, only DiffEntryList")
+        else:
+            to_add = []
+            to_remove = []
+            for diff_entry in diff:
+                entry = Entry(str(diff_entry)[1:])
+                if diff_entry.mode == "+":
+                    to_add.append(entry)
+                else:
+                    to_remove.append(entry)
+            self.sum(EntryList(to_add))
+            self.diff(EntryList(to_remove), log=False)
+
 
 class DiffEntry(Entry):
 
@@ -137,7 +152,6 @@ class DiffEntryList:
 
     @staticmethod
     def open(filename):
-        data = None
         with open(filename, "r") as f:
             data = f.readlines()
 
@@ -174,3 +188,49 @@ class DiffEntryList:
                 output.append(entry)
         return output
 
+
+class DiffEntryHistory:
+
+    def __init__(self, root, meta=None, data=None):
+        self.root = root
+        self.data = []
+        self.meta = []
+        for item in data:
+            if not isinstance(item, DiffEntryList):
+                raise ValueError(f"Can only add DiffEntryList to DiffEntryHistory")
+            else:
+                self.data.append(item)
+        for item in meta:
+            if not isinstance(item, str):
+                raise ValueError(f"Meta can only contain strings, not {type(item)}")
+            else:
+                self.meta.append(item)
+
+    def __iter__(self):
+        return iter(self.data)
+
+    @staticmethod
+    def open(directory):
+        with open(f"{directory}/_meta.txt") as f:
+            meta = f.readlines()
+
+        for n in range(len(meta)):
+            meta[n] = meta[n].strip()
+
+        root = EntryList.open(f"{directory}/{meta[0]}.tsv")
+
+        data = []
+
+        for n in range(1, len(meta)):
+            diff_el = DiffEntryList.open(f"{directory}/{meta[n-1]}-{meta[n]}.tsv")
+            data.append(diff_el)
+
+        return DiffEntryHistory(root=root, meta=meta, data=data)
+
+    def rebuild(self):
+        start = EntryList(self.root.data)
+
+        for diff_el in self:
+            start.process_diff(diff_el)
+
+        return start
