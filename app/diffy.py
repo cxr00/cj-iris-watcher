@@ -8,7 +8,7 @@ class Entry:
     def __init__(self, data):
         if isinstance(data, DiffEntry):
             self.name = data.name
-            self.id = data.id
+            self.dpsst_num = data.dpsst_num
             self.agency = data.agency
             self.rank = data.rank
             self.status = data.status
@@ -16,7 +16,7 @@ class Entry:
             data = data.split("\t")
 
             self.name = data[0]
-            self.id = data[1]
+            self.dpsst_num = data[1]
 
             if len(data) > 2:
                 self.agency = data[2]
@@ -38,15 +38,15 @@ class Entry:
             return False
         else:
             return self.name == other.name \
-                and self.id == other.id \
-                and self.agency == other.agency \
-                and self.rank == other.rank
+                   and self.dpsst_num == other.dpsst_num \
+                   and self.agency == other.agency \
+                   and self.rank == other.rank
 
     def __hash__(self):
         return hash(str(self))
 
     def __str__(self):
-        return "\t".join([self.name, self.id, self.agency, self.rank, self.status])
+        return "\t".join([self.name, self.dpsst_num, self.agency, self.rank, self.status])
 
 
 class EntryList:
@@ -111,6 +111,13 @@ class EntryList:
             if log:
                 print("Differencing complete.")
             return [self, EntryList(new)]
+
+    def get_by_dpsst_num(self, dpsst_num):
+        output = EntryList()
+        for entry in self:
+            if entry.dpsst_num == dpsst_num:
+                output.append(entry)
+        return output
 
     def sum(self, other):
         if not isinstance(other, EntryList):
@@ -268,12 +275,12 @@ class DiffEntryHistory:
 
         return start
 
-    def count_suspicious_ppb(self):
+    def count_presence(self, ppb=False):
         output = {}
 
         # The root file is the first addition
         for entry in self.root:
-            if entry.agency == "Portland Police Bureau":
+            if not ppb or entry.agency == "Portland Police Bureau":
                 output[entry] = 1
 
         for diff_entry_list in self.data:
@@ -282,7 +289,7 @@ class DiffEntryHistory:
 
                 if entry in output:
                     output[entry] += 1 if diff_entry.mode == "+" else -1
-                elif entry.agency == "Portland Police Bureau":
+                elif not ppb or entry.agency == "Portland Police Bureau":
                     # In case entries are removed before being added
                     output[entry] = 1 if diff_entry.mode == "+" else -1
 
