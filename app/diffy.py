@@ -63,6 +63,12 @@ class EntryList:
     def __iter__(self):
         return iter(self.data)
 
+    def __getitem__(self, item):
+        if isinstance(item, int):
+            return self.data[item]
+        else:
+            raise ValueError(f"KeyError: {item}")
+
     def __len__(self):
         return len(self.data)
 
@@ -113,6 +119,9 @@ class EntryList:
             return [self, EntryList(new)]
 
     def get_by_dpsst_num(self, dpsst_num):
+        """
+        Get the contents of the EntryList where DPSST number matches
+        """
         output = EntryList()
         for entry in self:
             if entry.dpsst_num == dpsst_num:
@@ -120,6 +129,9 @@ class EntryList:
         return output
 
     def sum(self, other):
+        """
+        Add the elements of one EntryList to this one
+        """
         if not isinstance(other, EntryList):
             raise ValueError(f"Cannot sum {type(other)}, only EntryList")
         else:
@@ -128,6 +140,9 @@ class EntryList:
                 self.append(entry)
 
     def process_diff(self, diff):
+        """
+        Difference the EntryList with the contents of the DiffEntryList
+        """
         if not isinstance(diff, DiffEntryList):
             raise ValueError(f"Cannot process {type(diff)}, only DiffEntryList")
         else:
@@ -198,13 +213,6 @@ class DiffEntryList:
                 output.append(entry)
         return output
 
-    def ppb(self):
-        output = DiffEntryList()
-        for entry in self.diff_entries:
-            if "Portland Police Bureau" in entry.agency:
-                output.append(entry)
-        return output
-
 
 class DiffEntryHistory:
 
@@ -264,6 +272,11 @@ class DiffEntryHistory:
         return DiffEntryHistory(root=root, meta=meta, data=data)
 
     def rebuild(self, n=-1):
+        """
+        Use DiffEntryLists to reconstruct a data set at a particular point
+
+        :param n: the index to rebuild to
+        """
         if n == -1:
             n = len(self)
         start = EntryList(self.root.data)
@@ -275,28 +288,28 @@ class DiffEntryHistory:
 
         return start
 
-    def count_presence(self, ppb=False):
+    def count_presence(self):
         output = {}
 
-        # The root file is the first addition
         for entry in self.root:
-            if not ppb or entry.agency == "Portland Police Bureau":
-                output[entry] = 1
+            if entry.dpsst_num in output:
+                output[entry.dpsst_num]["+"].append(entry)
+            else:
+                output[entry.dpsst_num] = {"+": EntryList([entry]), "-": EntryList()}
 
-        for diff_entry_list in self.data:
+        for diff_entry_list in self:
             for diff_entry in diff_entry_list:
                 entry = Entry(diff_entry)
 
-                if entry in output:
-                    output[entry] += 1 if diff_entry.mode == "+" else -1
-                elif not ppb or entry.agency == "Portland Police Bureau":
-                    # In case entries are removed before being added
-                    output[entry] = 1 if diff_entry.mode == "+" else -1
+                if entry.dpsst_num not in output:
+                    output[entry.dpsst_num] = {"+": EntryList(), "-": EntryList()}
 
-        output2 = []
+                output[entry.dpsst_num][diff_entry.mode].append(entry)
 
-        for key in output:
-            if output[key] == 0:
-                output2.append(key)
+        output2 = EntryList()
 
-        return EntryList(output2)
+        for dpsst_num in output:
+            if len(output[dpsst_num]["+"]) == len(output[dpsst_num]["-"]):
+                output2.append(output[dpsst_num]["+"][0])
+
+        return output2
