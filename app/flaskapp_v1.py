@@ -22,7 +22,7 @@ print("Loading primary DiffEntryHistory...")
 
 diff_eh = DiffEntryHistory.open("repo/diff")
 
-ppb_count = diff_eh.count_suspicious_ppb()
+count = diff_eh.count_presence()
 
 print("Load complete.")
 
@@ -66,7 +66,7 @@ def front_page():
     today = datetime.today().strftime("%Y%m%d")
     return render_template(
         "summary.html",
-        entries=ppb_count,
+        entries=count,
         today=today
     )
 

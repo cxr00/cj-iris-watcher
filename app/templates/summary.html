@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PPB Watcher</title>
+    <title>CJ IRIS Watcher</title>
     <script src="/static/nav.js"></script>
 </head>
 <body>
@@ -11,18 +11,23 @@
     <h3> What is this?</h3>
     <p>This site is a repository for data collected from the Oregon CJ IRIS database at <a href="https://www.bpl-orsnapshot.net/PublicInquiry_CJ/EmployeeSearch.aspx" target="_blank">this link</a>.</p>
     <p>Data from CJ IRIS is collected daily and compared to data from the day before. Changes, ie additions and removals, are documented and reported here.</p>
-    <p><strong>So why does it matter?</strong></p>
-    <p>When a member of the Portland Police Bureau goes undercover, their name and DPSST number is removed from the database.</p>
-    <p>The goal of this data collection is to spot when those entries are removed, and potentially identify undercover officers.</p>
-    <br />
-    <h3>Potential undercover officers</h3>
+    <p>This data is imperfect. Still, an effort is made to provide insights into this public data.</p>
+
+    <h3>Missing Entries</h3>
+
+    <p>One of the goals of this project is to track DPSST numbers as they are added and removed from the database.</p>
+    <p>Below is a list of entries in the database that were removed at some point. Should they be re-added, they will be removed from this list.</p>
 
     {% if entries|length == 0 %}
-    <p>No suspected undercover officers as of {{ today }}</p>
+    <p>No missing entries as of {{ today }}</p>
     {% else %}
     <table>
         {% for entry in entries %}
+        {% if entry.agency == "Portland Police Bureau" %}
+        <tr class="ppb">
+        {% else %}
         <tr>
+        {% endif %}
             <td>{{entry.name}}</td>
             <td>{{entry.id}}</td>
             <td>{{entry.agency}}</td>
@@ -30,7 +35,7 @@
             <td>{{entry.status}}</td>
         </tr>
         {% endfor %}
-    {% endif %}
     </table>
+    {% endif %}
 </body>
 </html>
