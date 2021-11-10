@@ -233,7 +233,7 @@ class DiffEntryHistory:
 
     def __getitem__(self, i):
         if isinstance(i, int):
-            if i < -1:
+            if i < 0:
                 raise ValueError(f"Invalid int {i} for DiffEntryHistory.__getitem__")
             else:
                 return self.rebuild(n=i)
