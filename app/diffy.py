@@ -6,25 +6,32 @@ class Entry:
     """
 
     def __init__(self, data):
-        data = data.split("\t")
-
-        self.name = data[0]
-        self.id = data[1]
-
-        if len(data) > 2:
-            self.agency = data[2]
+        if isinstance(data, DiffEntry):
+            self.name = data.name
+            self.id = data.id
+            self.agency = data.agency
+            self.rank = data.rank
+            self.status = data.status
         else:
-            self.agency = ""
+            data = data.split("\t")
 
-        if len(data) > 3:
-            # For backwards compatibility's sake
-            self.rank = data[3]
+            self.name = data[0]
+            self.id = data[1]
 
-            # Not currently used in comparisons but recorded anyway
-            self.status = data[4]
-        else:
-            self.rank = ""
-            self.status = ""
+            if len(data) > 2:
+                self.agency = data[2]
+            else:
+                self.agency = ""
+
+            if len(data) > 3:
+                # For backwards compatibility's sake
+                self.rank = data[3]
+
+                # Not currently used in comparisons but recorded anyway
+                self.status = data[4]
+            else:
+                self.rank = ""
+                self.status = ""
 
     def __eq__(self, other):
         if not isinstance(other, Entry):
@@ -34,6 +41,9 @@ class Entry:
                 and self.id == other.id \
                 and self.agency == other.agency \
                 and self.rank == other.rank
+
+    def __hash__(self):
+        return hash(str(self))
 
     def __str__(self):
         return "\t".join([self.name, self.id, self.agency, self.rank, self.status])
@@ -241,3 +251,29 @@ class DiffEntryHistory:
             start.process_diff(diff_el)
 
         return start
+
+    def count_suspicious_ppb(self):
+        output = {}
+
+        # The root file is the first addition
+        for entry in self.root:
+            if entry.agency == "Portland Police Bureau":
+                output[entry] = 1
+
+        for diff_entry_list in self.data:
+            for diff_entry in diff_entry_list:
+                entry = Entry(diff_entry)
+
+                if entry in output:
+                    output[entry] += 1 if diff_entry.mode == "+" else -1
+                elif entry.agency == "Portland Police Bureau":
+                    # In case entries are removed before being added
+                    output[entry] = 1 if diff_entry.mode == "+" else -1
+
+        output2 = []
+
+        for key in output:
+            if output[key] == 0:
+                output2.append(key)
+
+        return EntryList(output2)

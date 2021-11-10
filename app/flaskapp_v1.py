@@ -22,6 +22,8 @@ print("Loading primary DiffEntryHistory...")
 
 diff_eh = DiffEntryHistory.open("repo/diff")
 
+ppb_count = diff_eh.count_suspicious_ppb()
+
 print("Load complete.")
 
 
@@ -62,7 +64,11 @@ def favicon():
 @app.route("/")
 def front_page():
     today = datetime.today().strftime("%Y%m%d")
-    return construct_template(today)
+    return render_template(
+        "summary.html",
+        entries=ppb_count,
+        today=today
+    )
 
 
 @app.route("/<datecode>")
