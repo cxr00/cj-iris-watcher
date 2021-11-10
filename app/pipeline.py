@@ -93,6 +93,25 @@ def test_partial_rebuilds():
     print()
 
 
+def test_history_slicing():
+
+    diff_eh = DiffEntryHistory.open("repo/diff")
+
+    print("\n".join(diff_eh.meta) + "\n")
+
+    d = diff_eh[2].diff(diff_eh[3])
+
+    print(d[0])
+    print(d[1])
+    print()
+
+    d = diff_eh[1:][1].diff(diff_eh[1:][2])
+
+    print(d[0])
+    print(d[1])
+    print()
+
+
 if __name__ == "__main__":
     scrape_and_diff_today_from_yesterday()
     delete_old_tsv()

@@ -216,6 +216,22 @@ class DiffEntryHistory:
             else:
                 self.meta.append(item)
 
+    def __getitem__(self, i):
+        if isinstance(i, int):
+            if i < -1:
+                raise ValueError(f"Invalid int {i} for DiffEntryHistory.__getitem__")
+            else:
+                return self.rebuild(n=i)
+        elif isinstance(i, slice):
+            start = i.start if i.start else 0
+            stop = i.stop if i.stop else len(self) + 1
+
+            root = self.rebuild(start)
+            data = self.data[start:stop]
+            meta = self.meta[start:stop]
+
+            return DiffEntryHistory(root, meta, data)
+
     def __iter__(self):
         return iter(self.data)
 
