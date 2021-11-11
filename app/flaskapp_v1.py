@@ -93,5 +93,5 @@ def legacy_portal():
 
 
 if __name__ == "__main__":
-    print("Serving PPB Watcher")
+    print("Serving CJ IRIS Watcher")
     serve(app, host="0.0.0.0", port=5000)
