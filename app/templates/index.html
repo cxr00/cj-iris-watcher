@@ -12,6 +12,10 @@
     <button id="next" onclick="go_to(&quot;{{tomorrow}}&quot;)">Go to tomorrow: {{tomorrow}}</button>
     <button id="legacy" onclick="go_to(&quot;legacy&quot;)">View legacy data</button>
     <button id="summary" onclick="go_to(&quot;&quot;)">View CJ IRIS summary</button>
+
+    {% if today == "20211101" %}
+    <p>November 1st, 2021 is the first day that modern data was collected. As such, there is no difference data available.</p>
+    {% endif %}
     <table>
         <tr>
             <th>Name</th>

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, send_from_directory, request
-from diffy import EntryList, DiffEntryHistory
+from diffy import EntryList, DiffEntryHistory, DiffEntryList
 
 import os
 from datetime import datetime
@@ -28,23 +28,28 @@ print("Load complete.")
 
 
 def construct_template(today):
+    ind = diff_eh.meta.index(today)
 
     # Determine value of yesterday for button functionality
-    if diff_eh.meta.index(today) != 0:
-        yesterday = diff_eh.meta[diff_eh.meta.index(today) - 1]
+    if ind != 0:
+        yesterday = diff_eh.meta[ind - 1]
     else:
         yesterday = today
 
     # Determine value of tomorrow for button functionality
-    if diff_eh.meta.index(today) != len(diff_eh.meta) - 1:
-        tomorrow = diff_eh.meta[diff_eh.meta.index(today) + 1]
+    if ind != len(diff_eh.meta) - 1:
+        tomorrow = diff_eh.meta[ind + 1]
     else:
         tomorrow = today
 
-    diff_list = diff_eh.data[diff_eh.meta.index(today) - 1]
+    if ind == 0:
+        added = DiffEntryList()
+        removed = DiffEntryList()
+    else:
+        diff_list = diff_eh.data[ind - 1]
 
-    added = diff_list.added()
-    removed = diff_list.removed()
+        added = diff_list.added()
+        removed = diff_list.removed()
 
     return render_template(
         "index.html",
