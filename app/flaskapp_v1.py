@@ -68,11 +68,10 @@ def favicon():
 
 @app.route("/")
 def front_page():
-    today = datetime.today().strftime("%Y%m%d")
     return render_template(
         "summary.html",
         entries=count,
-        today=today
+        today=diff_eh.meta[-1]
     )
 
 
