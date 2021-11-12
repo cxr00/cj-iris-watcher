@@ -1,5 +1,6 @@
 from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
@@ -213,8 +214,11 @@ def scrape_all_data(datecode=None, directory=None, overwrite=False):
 
     letter_combos = [chr(i) + chr(j) for i in range(97, 123) for j in range(97, 123)]
 
+    options = Options()
+    options.headless = True
+
     # If your driver is in a different place, change this
-    driver = webdriver.Chrome(executable_path="chromedriver.exe")
+    driver = webdriver.Chrome(executable_path="chromedriver.exe", options=options)
     driver.get(bpl_url)
 
     # Create TSV folder if one doesn't exist
@@ -230,7 +234,7 @@ def scrape_all_data(datecode=None, directory=None, overwrite=False):
                 for entry in entries:
                     print(entry)
                     f.write("\t".join(entry) + "\n")
+        else:
+            print(f"No entries for {search_term}")
 
-    # Relax
-    time.sleep(8)
     driver.close()
