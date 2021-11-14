@@ -216,10 +216,11 @@ class DiffEntryList:
 
 class DiffEntryHistory:
 
-    def __init__(self, root, meta=None, data=None):
+    def __init__(self, root, meta=None, data=None, directory=None):
         self.root = root
         self.data = []
         self.meta = []
+        self.directory = directory
         for item in data:
             if not isinstance(item, DiffEntryList):
                 raise ValueError(f"Can only add DiffEntryList to DiffEntryHistory")
@@ -245,7 +246,7 @@ class DiffEntryHistory:
             data = self.data[start:stop]
             meta = self.meta[start:stop]
 
-            return DiffEntryHistory(root, meta, data)
+            return DiffEntryHistory(root, meta, data, self.directory)
 
     def __iter__(self):
         return iter(self.data)
@@ -269,7 +270,7 @@ class DiffEntryHistory:
             diff_el = DiffEntryList.open(f"{directory}/{meta[n-1]}-{meta[n]}.tsv")
             data.append(diff_el)
 
-        return DiffEntryHistory(root=root, meta=meta, data=data)
+        return DiffEntryHistory(root=root, meta=meta, data=data, directory=directory)
 
     def rebuild(self, n=-1):
         """
@@ -287,6 +288,32 @@ class DiffEntryHistory:
             start.process_diff(diff_el)
 
         return start
+
+    def rebase(self, n):
+        """
+        Rebuild to the n-th index, save the root, and update the meta file. Also
+        saves a backup of the old meta file in case you didn't actually want to rebase.
+
+        This is unimplemented in the pipeline as of yet but can be run
+        manually if your archive gets to be larger than like 500 differences.
+
+        This does not remove old diff files, it just excludes them from being loaded
+        the next time a DiffEntryHistory is opened. So you
+        """
+        output = self[n:]
+
+        filename = f"{output.directory}/{output.meta[0]}.tsv"
+        meta_path = f"{output.directory}/_meta.txt"
+        backup_meta = f"{output.directory}/_meta_old.txt"
+
+        with open(filename, "w+") as f:
+            f.write(str(output.root))
+
+        with open(meta_path, "w+") as f:
+            f.write("\n".join(output.meta) + "\n")
+
+        with open(backup_meta, "w+") as f:
+            f.write("\n".join(self.meta) + "\n")
 
     def count_presence(self):
         output = {}

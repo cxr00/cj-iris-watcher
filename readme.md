@@ -34,3 +34,33 @@ I don't have a requirements.txt or anything like that, so you'll have to configu
 ### The web app
 
 `flaskapp_v1.py` contains the implementation of a simple web application for navigating the data. This **only** works for a repo named `repo`, so if you want to change that you will have to edit this file. But it's just easier to give the repo the proper name in the first place, I promise.
+
+
+### Miscellaneous
+
+#### Rebasing
+
+Let's say your archive has grown to a few hundred differences. Maybe it's making the data unwieldy to look at, or maybe it's taking a bit too long to load.
+
+The solution is to rebase your archive. To start, select and open the DiffEntryHistory you want to rebase:
+
+```python
+deh = DiffEntryHistory.open("path/to/diff")
+```
+
+Let's say you want to reduce your archive by 200 days. Then call the rebase function like this:
+
+```python
+deh.rebase(200)
+```
+
+And voila, your archive has been rebased! This doesn't delete any files, and also produces a `_meta_old.txt` file which contains the pre-rebase data in case you want to undo. 
+
+If you want to automate this process, you could do something like this:
+
+```python
+if len(deh) > 365:
+    deh.rebase(len(deh) - 365)
+```
+
+This will ensure your archive is always a reasonable size. It is ultimately up to you how much data you want the app to handle.
