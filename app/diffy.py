@@ -337,6 +337,17 @@ class DiffEntryHistory:
 
         for dpsst_num in output:
             if len(output[dpsst_num]["+"]) == len(output[dpsst_num]["-"]):
-                output2.append(output[dpsst_num]["+"][0])
+
+                # Get PPB entry if it exists
+                is_ppb = False
+                for entry in output[dpsst_num]["+"]:
+                    if entry.agency == "Portland Police Bureau":
+                        output2.append(entry)
+                        is_ppb = True
+                        break
+
+                # Otherwise just take an arbitrary one
+                if not is_ppb:
+                    output2.append(output[dpsst_num]["+"][0])
 
         return output2
