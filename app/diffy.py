@@ -272,13 +272,18 @@ class DiffEntryHistory:
 
         return DiffEntryHistory(root=root, meta=meta, data=data, directory=directory)
 
-    def rebuild(self, n=-1):
+    def rebuild(self, n=-1, datecode=None):
         """
         Use DiffEntryLists to reconstruct a data set at a particular point
 
         :param n: the index to rebuild to
         """
-        if n == -1:
+        if datecode:
+            if datecode in self.meta:
+                n = self.meta.index(datecode)
+            else:
+                raise ValueError(f"Datecode {datecode} not in this DiffEntryHistory")
+        elif n == -1:
             n = len(self)
         start = EntryList(self.root.data)
 
