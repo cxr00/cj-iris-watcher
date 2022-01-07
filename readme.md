@@ -11,7 +11,7 @@ My routine is fairly straightforward: I run `pipeline.py` to get the most curren
 
 ## To do this yourself
 
-If you decide to try to run this, make sure to change the name of `sample_repo` to just `repo` (trust me, it's easier this way). You should also download the most recent chromedriver [here](https://chromedriver.chromium.org/downloads) instead of using the one included in this repo. It is a mysterious `.exe` file on the internet after all.
+If you decide to try to run this, make sure to change the name of `sample_repo` to just `repo` (trust me, it's easier this way). You also need to download the most recent chromedriver [here](https://chromedriver.chromium.org/downloads).
 
 `run_scraper.cmd` accesses CJ IRIS. Don't be alarmed, but it may open a window and navigate its links. You can do other stuff while this runs, the program doesn't need browser focus to work.
 
