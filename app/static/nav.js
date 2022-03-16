@@ -1,5 +1,5 @@
 function go_to(datecode) {
-    window.location.href = "/" + datecode;
+    window.open("/" + datecode, "_self")
 }
 
 function show_only_this(id) {
