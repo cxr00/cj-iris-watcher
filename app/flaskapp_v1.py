@@ -1,13 +1,13 @@
-from flask import Flask, render_template, send_from_directory, request
-from diffy import EntryList, DiffEntryHistory, DiffEntryList
-
 import os
-from datetime import datetime
+
+from flask import Flask, render_template, send_from_directory
 from waitress import serve
+
+from diffy import EntryList, DiffEntryHistory, DiffEntryList
 
 app = Flask(__name__)
 
-print("Loading legacy data sets...")
+print(f"Loading legacy data sets...")
 
 # Legacy additions
 el_adds_0 = EntryList.open("repo/legacy/added/20190202-20200625+.tsv").data
@@ -17,14 +17,14 @@ el_adds_1 = EntryList.open("repo/legacy/added/20200625-20211101+.tsv").data
 el_rms_0 = EntryList.open("repo/legacy/removed/20190202-20200625-.tsv").data
 el_rms_1 = EntryList.open("repo/legacy/removed/20200625-20211101-.tsv").data
 
-print("Load complete.")
-print("Loading primary DiffEntryHistory...")
+print(f"Load complete.")
+print(f"Loading primary DiffEntryHistory...")
 
 diff_eh = DiffEntryHistory.open("repo/diff")
 
 count = diff_eh.count_presence()
 
-print("Load complete.")
+print(f"Load complete.")
 
 
 def construct_template(today):
@@ -63,7 +63,8 @@ def construct_template(today):
 
 @app.route("/favicon.ico")
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, "static"), "favicon.ico", mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(os.path.join(app.root_path, "static"), "favicon.ico",
+                               mimetype='image/vnd.microsoft.icon')
 
 
 @app.route("/")
@@ -92,5 +93,5 @@ def legacy_portal():
 
 
 if __name__ == "__main__":
-    print("Serving CJ IRIS Watcher at 127.0.0.1:5000")
+    print(f"Serving CJ IRIS Watcher at 127.0.0.1:5000")
     serve(app, host="0.0.0.0", port=5000)

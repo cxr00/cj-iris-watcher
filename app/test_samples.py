@@ -6,24 +6,24 @@ to do things with your DiffEntryHistory
 """
 
 
-def count_active_in_areas(deh):
+def count_active_in_areas(diffentryhistory):
     output = 0
     areas = ("multnomah", "clackamas")
 
     # rebuild produces an EntryList, which does not contain differencing information
-    entrylist = deh.rebuild(-1)
+    entrylist = diffentryhistory.rebuild(-1)
 
     for entry in entrylist:
         if entry.status == "Active" and any(area in entry.agency.lower() for area in areas):
             output += 1
-    
+
     return output
 
 
-def count_active_dispatchers(deh):
+def count_active_dispatchers(diffentryhistory):
     output = 0
 
-    entrylist = deh.rebuild(-1)
+    entrylist = diffentryhistory.rebuild(-1)
 
     for entry in entrylist:
         if entry.rank.lower() == "dispatcher" and entry.status == "Active":
@@ -32,11 +32,11 @@ def count_active_dispatchers(deh):
     return output
 
 
-def count_inactive(deh):
+def count_inactive(diffentryhistory):
     output = 0
     names = []
 
-    entrylist = deh.rebuild(-1)
+    entrylist = diffentryhistory.rebuild(-1)
 
     for entry in entrylist:
         if entry.status == "Inactive" and entry.name not in names:
@@ -46,11 +46,10 @@ def count_inactive(deh):
     return output
 
 
-def test_rebuild_with_datecode_argument(deh):
+def test_rebuild_with_datecode_argument(diffentryhistory):
+    el0 = diffentryhistory.root
 
-    el0 = deh.root
-
-    el1 = deh.rebuild(datecode="20211111")
+    el1 = diffentryhistory.rebuild(datecode="20211111")
 
     print(len(el0))
     print(len(el1))
