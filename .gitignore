@@ -8,3 +8,4 @@ chromedriver.exe
 venv
 .env
 .vscode
+.python-version
