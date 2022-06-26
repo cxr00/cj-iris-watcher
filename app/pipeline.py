@@ -1,8 +1,8 @@
-from bpl_scraper import scrape_all_data
-from diffy import EntryList, DiffEntryHistory
-
 import datetime
 import os
+
+from bpl_scraper import scrape_all_data
+from diffy import EntryList, DiffEntryHistory
 
 
 def scrape_and_diff_today_from_yesterday(directory=None):
@@ -69,6 +69,7 @@ def delete_old_tsv(directory=None):
 
     Hangs on to the past couple days just in case
     """
+
     def create_filename(datecode0, datecode1):
         return f"repo/diff/{datecode0}-{datecode1}.tsv"
 
@@ -78,7 +79,7 @@ def delete_old_tsv(directory=None):
     eh = DiffEntryHistory.open(f"{directory}/diff")
 
     for n in range(1, len(eh.meta) - 2):
-        diff_filename = create_filename(eh.meta[n-1], eh.meta[n])
+        diff_filename = create_filename(eh.meta[n - 1], eh.meta[n])
         if os.path.exists(diff_filename):
             del_filename = f"{directory}/scrape/{eh.meta[n]}.tsv"
             if os.path.exists(del_filename):

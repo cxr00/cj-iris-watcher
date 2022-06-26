@@ -1,5 +1,3 @@
-
-
 class Entry:
     """
     An individual data point from the BPL site
@@ -101,7 +99,7 @@ class EntryList:
             {b: b in B and b not in A}, which is the newly-added entries now present in B
 
         In order for differencing to work properly, A must be from the earlier today,
-        and B from the later today. Otherwise the results will be reversed
+        and B from the later today otherwise the results will be reversed
         """
         if not isinstance(other, EntryList):
             raise ValueError(f"Cannot difference {type(other)}, only EntryList")
@@ -267,7 +265,7 @@ class DiffEntryHistory:
         data = []
 
         for n in range(1, len(meta)):
-            diff_el = DiffEntryList.open(f"{directory}/{meta[n-1]}-{meta[n]}.tsv")
+            diff_el = DiffEntryList.open(f"{directory}/{meta[n - 1]}-{meta[n]}.tsv")
             data.append(diff_el)
 
         return DiffEntryHistory(root=root, meta=meta, data=data, directory=directory)
@@ -351,7 +349,7 @@ class DiffEntryHistory:
                         is_ppb = True
                         break
 
-                # Otherwise just take an arbitrary one
+                # Otherwise, just take an arbitrary one
                 if not is_ppb:
                     output2.append(output[dpsst_num]["+"][0])
 

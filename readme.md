@@ -13,9 +13,9 @@ My routine is fairly straightforward: I run `pipeline.py` to get the most curren
 
 If you decide to try to run this, make sure to change the name of `sample_repo` to just `repo` (trust me, it's easier this way). You also need to download the most recent chromedriver [here](https://chromedriver.chromium.org/downloads).
 
-`run_scraper.cmd` accesses CJ IRIS. Don't be alarmed, but it may open a window and navigate its links. You can do other stuff while this runs, the program doesn't need browser focus to work.
+`run_scraper.sh` accesses CJ IRIS. Don't be alarmed, but it may open a window and navigate its links. You can do other stuff while this runs, the program doesn't need browser focus to work.
 
-`run_flaskapp.cmd` compiles the data into a simple web application which can be accessed at `127.0.0.1:5000`. The home page includes an explanation of what you're looking at.
+`run_flaskapp.sh` compiles the data into a simple web application which can be accessed at `127.0.0.1:5000`. The home page includes an explanation of what you're looking at.
 
 I don't have a requirements.txt or anything like that, so you'll have to configure your environment with Flask, Waitress, and Selenium.
 

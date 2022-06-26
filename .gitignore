@@ -1,6 +1,11 @@
-
+.history
+.DS_*
 .idea/inspectionProfiles/profiles_settings.xml
 .idea
 __pycache__
 repo
 chromedriver.exe
+venv
+.env
+.vscode
+.python-version

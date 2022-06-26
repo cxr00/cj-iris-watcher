@@ -1,11 +1,11 @@
-from selenium.common.exceptions import NoSuchElementException
+import os
+import re
+
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-
-import re
-import os
 
 # The namesake of the scraper
 bpl_url = "https://www.bpl-orsnapshot.net/PublicInquiry_CJ/EmployeeSearch.aspx"
@@ -57,7 +57,7 @@ def go_to_previous_page(driver):
     for element in elements:
         # Pull the page number from the link text
         href = element.get_attribute("href")
-        m = re.search(r"Page\$[0-9]*", href)
+        m = re.search(r"Page\$\d*", href)
         if m:
             ellipsis_page = int(m.group(0)[5:])
             if ellipsis_page == current_page - 1:
@@ -100,7 +100,7 @@ def go_to_next_page(driver):
     for element in elements:
         # Pull the page number from the link text
         href = element.get_attribute("href")
-        m = re.search(r"Page\$[0-9]*", href)
+        m = re.search(r"Page\$\d*", href)
         if m:
             ellipsis_page = int(m.group(0)[5:])
             if ellipsis_page == current_page + 1:
@@ -217,7 +217,7 @@ def scrape_all_data(datecode=None, directory=None, overwrite=False):
     options.headless = True
 
     # If your driver is in a different place, change this
-    driver = webdriver.Chrome(executable_path="chromedriver.exe", options=options)
+    driver = webdriver.Chrome(executable_path="chromedriver", options=options)
     driver.get(bpl_url)
 
     # Create TSV folder if one doesn't exist
