@@ -17,7 +17,7 @@ If you decide to try to run this, make sure to change the name of `sample_repo` 
 
 `run_flaskapp.sh` compiles the data into a simple web application which can be accessed at `127.0.0.1:5000`. The home page includes an explanation of what you're looking at.
 
-I don't have a requirements.txt or anything like that, so you'll have to configure your environment with Flask, Waitress, and Selenium.
+The scraper uses Selenium to open and navigate the browser and collect data. Flask and Waitress are used to serve the local web app.
 
 ### Web scraper
 
